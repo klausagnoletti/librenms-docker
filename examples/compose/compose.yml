@@ -18,34 +18,30 @@ services:
       - "MYSQL_DATABASE=${MYSQL_DATABASE}"
       - "MYSQL_USER=${MYSQL_USER}"
       - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
-      - "MYSQL_IP={MYSQL_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "MYSQL_IP"
+        ipv4_address: "$MYSQL_IP"
 
   redis:
     image: redis:7.2-alpine
     container_name: librenms_redis
     environment:
       - "TZ=${TZ}"
-      - "REDIS_IP=${REDIS_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "REDIS_IP"
+        ipv4_address: "$REDIS_IP"
 
   msmtpd:
     image: crazymax/msmtpd:latest
     container_name: librenms_msmtpd
     env_file:
       - "./msmtpd.env"
-    environment:
-      - "MSMTPD_IP=${MSMTPD_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "MSMTPD_IP"
+        ipv4_address: "$MSMTPD_IP"
 
   librenms:
     image: librenms/librenms:latest
@@ -75,11 +71,10 @@ services:
       - "DB_USER=${MYSQL_USER}"
       - "DB_PASSWORD=${MYSQL_PASSWORD}"
       - "DB_TIMEOUT=60"
-      - "LIBRENMS_IP=${LIBRENMS_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "LIBRENMS_IP"
+        ipv4_address: "$LIBRENMS_IP"
 
   dispatcher:
     image: librenms/librenms:latest
@@ -106,11 +101,10 @@ services:
       - "DB_TIMEOUT=60"
       - "DISPATCHER_NODE_ID=dispatcher1"
       - "SIDECAR_DISPATCHER=1"
-      - "DISPATCHER_IP=${DISPATCHER_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "DISPATCHER_IP"
+        ipv4_address: "$DISPATCHER_IP"
 
   syslogng:
     image: librenms/librenms:latest
@@ -143,11 +137,10 @@ services:
       - "DB_PASSWORD=${MYSQL_PASSWORD}"
       - "DB_TIMEOUT=60"
       - "SIDECAR_SYSLOGNG=1"
-      - "SYSLOGNG_IP=${SYSLOGNG_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "SYSLOGNG_IP"
+        ipv4_address: "$SYSLOGNG_IP"
 
   snmptrapd:
     image: librenms/librenms:latest
@@ -180,19 +173,12 @@ services:
       - "DB_PASSWORD=${MYSQL_PASSWORD}"
       - "DB_TIMEOUT=60"
       - "SIDECAR_SNMPTRAPD=1"
-      - "SNMPTRAPD_IP=${SNMPTRAPD_IP}"
     restart: always
     networks:
       macvlan-lan:
-        ipv4_address: "SNMPTRAPD_IP"
+        ipv4_address: "$SNMPTRAPD_IP"
 
 networks:
-  macvlan-lan:
-    driver: macvlan
-    driver_opts:
-      parent: br1
-    ipam:
-      config:
-        - subnet: ${NETWORK_SUBNET}
-          gateway: ${NETWORK_GATEWAY}
-          ip_range: ${NETWORK_RANGE}
+   macvlan-lan:
+     name: macvlan-lan
+     external: true 
