@@ -1,6 +1,7 @@
 
 
 name: librenms
+version: "2.1"
 
 services:
   db:
