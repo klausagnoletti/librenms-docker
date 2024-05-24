@@ -1,3 +1,5 @@
+
+
 name: librenms
 
 services:
@@ -12,6 +14,8 @@ services:
       - "--collation-server=utf8mb4_unicode_ci"
     volumes:
       - "./db:/var/lib/mysql"
+    env_file:
+      - ".env"
     environment:
       - "TZ=${TZ}"
       - "MYSQL_ALLOW_EMPTY_PASSWORD=yes"
@@ -19,20 +23,32 @@ services:
       - "MYSQL_USER=${MYSQL_USER}"
       - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${MYSQL_IP}"
 
   redis:
     image: redis:7.2-alpine
     container_name: librenms_redis
+    env_file:
+      - ".env"
     environment:
       - "TZ=${TZ}"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${REDIS_IP}"
 
   msmtpd:
     image: crazymax/msmtpd:latest
     container_name: librenms_msmtpd
     env_file:
+      - ".env"
       - "./msmtpd.env"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${MSMTPD_IP}"
 
   librenms:
     image: librenms/librenms:latest
@@ -53,6 +69,7 @@ services:
       - "./librenms:/data"
     env_file:
       - "./librenms.env"
+      - ".env"
     environment:
       - "TZ=${TZ}"
       - "PUID=${PUID}"
@@ -63,6 +80,9 @@ services:
       - "DB_PASSWORD=${MYSQL_PASSWORD}"
       - "DB_TIMEOUT=60"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${LIBRENMS_IP}"
 
   dispatcher:
     image: librenms/librenms:latest
@@ -77,6 +97,7 @@ services:
     volumes:
       - "./librenms:/data"
     env_file:
+      - ".env"
       - "./librenms.env"
     environment:
       - "TZ=${TZ}"
@@ -90,6 +111,9 @@ services:
       - "DISPATCHER_NODE_ID=dispatcher1"
       - "SIDECAR_DISPATCHER=1"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${DISPATCHER_IP}"
 
   syslogng:
     image: librenms/librenms:latest
@@ -111,6 +135,7 @@ services:
     volumes:
       - "./librenms:/data"
     env_file:
+      - ".env"
       - "./librenms.env"
     environment:
       - "TZ=${TZ}"
@@ -123,6 +148,9 @@ services:
       - "DB_TIMEOUT=60"
       - "SIDECAR_SYSLOGNG=1"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${SYSLOGNG_IP}"
 
   snmptrapd:
     image: librenms/librenms:latest
@@ -144,6 +172,7 @@ services:
     volumes:
       - "./librenms:/data"
     env_file:
+      - ".env"
       - "./librenms.env"
     environment:
       - "TZ=${TZ}"
@@ -156,3 +185,6 @@ services:
       - "DB_TIMEOUT=60"
       - "SIDECAR_SNMPTRAPD=1"
     restart: always
+    networks:
+      macvlan-lan:
+        ipv4_address: "${SNMPTRAPD_IP}"
