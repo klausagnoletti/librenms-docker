@@ -1,7 +1,5 @@
-
-
-name: librenms
 version: "2.1"
+name: librenms
 
 services:
   db:
